@@ -1,15 +1,26 @@
+const config = require('./config');
 const express = require('express');
-const bodyParser = require('body-parser');
-// const router = require('./components/message/network');
-const router = require('./network/routes');
-const conect = require('./db');
-conect('mongodb://m001-student:platzi-admin@sandbox-shard-00-00-p8slk.mongodb.net:27017,sandbox-shard-00-01-p8slk.mongodb.net:27017,sandbox-shard-00-02-p8slk.mongodb.net:27017/telegrom?ssl=true&replicaSet=Sandbox-shard-0&authSource=admin&retryWrites=true&w=majority');
-const port = 3000;
+const app = express();
+const server = require('http').Server(app);
 
-var app = express();
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const socket = require('./socket');
+const db = require('./db');
+const router = require('./network/routes');
+
+
+db(config.dbUrl);
+app.use(cors());
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+
+socket.connect(server);
+
 router(app);
-app.use('/app', express.static('./public'));
-app.listen(port);
-console.log(`la aplicacion esta escuchando en localhost:${port}`);
+app.use(`${config.publicRoute}`, express.static('./public'));
+
+server.listen(config.port,()=>{
+    console.log(`la aplicacion esta escuchando en localhost:${config.port}`);
+});

@@ -3,9 +3,10 @@ const multer = require('multer');
 const router = express.Router();
 const response = require('../../network/response');
 const controller = require('./controller');
+const conf = require('../../config');
 
 const upload = multer({
-  dest: 'public/files/',
+  dest: `public/${conf.filesRoute}/`,
 });
 
 router.get('/', (req, resp)=>{
@@ -26,7 +27,7 @@ router.post('/', upload.single('file'), (req, resp)=>{
       response.success(resp, createdUser);
     })
     .catch(error => {
-      console.log('here is error');
+      console.log('here is error', error);
       response.error(resp, error);
     });
 });
